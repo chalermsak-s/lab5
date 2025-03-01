@@ -4,7 +4,7 @@ import type { Event } from '../models/event'
 import exp from 'constants'
 const router = express.Router()
 
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response) => {
   if (req.query.pageSize && req.query.pageNo) {
     const pageSize = parseInt(req.query.pageSize as string) || 3
     const pageNo = parseInt(req.query.pageNo as string) || 1
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
   }
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id)
   const event = await service.getEventById(id)
   if (event) {
@@ -34,7 +34,7 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request, res: Response) => {
   const newEvent: Event = req.body
   const result = await service.addEvent(newEvent)
   res.json(result)

@@ -1,6 +1,6 @@
 import { organizer } from './../../node_modules/.prisma/client/index.d'
 import { PrismaClient } from '@prisma/client'
-import type { Event,PageEvent } from '../models/event'
+import type { Event, PageEvent } from '../models/event'
 
 const prisma = new PrismaClient()
 
@@ -73,7 +73,12 @@ export async function getAllEventsWithOrganizerPagination(
   pageNo: number
 ) {
   const where = {
-    title: { contains: keyword },
+    OR: [
+      { title: { contains: keyword } },
+      { description: { contains: keyword } },
+      { category: { contains: keyword } },
+      { organizer: { name: { contains: keyword } } },
+    ],
   }
 
   const events = await prisma.event.findMany({
