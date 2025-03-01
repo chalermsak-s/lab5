@@ -71,7 +71,7 @@ This generates JavaScript files inside the `dist` folder.
 
 Run the compiled JavaScript file using Node.js:
 ```sh
-node dist/index.js
+node dist/index.js 
 ```
 
 ---
