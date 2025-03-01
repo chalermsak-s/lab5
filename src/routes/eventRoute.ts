@@ -9,17 +9,26 @@ router.get('/', async (req: Request, res: Response) => {
     const pageSize = parseInt(req.query.pageSize as string) || 3
     const pageNo = parseInt(req.query.pageNo as string) || 1
     const keyword = req.query.keyword as string
-    const result = await service.getAllEventsWithPagination(
-      keyword,
-      pageSize,
-      pageNo
-    )
-    if (result.events.length === 0) {
-      res.status(404).send('No event found')
+    try {
+      const result = await service.getAllEventsWithPagination(
+        keyword,
+        pageSize,
+        pageNo
+      )
+      if (result.events.length === 0) {
+        res.status(404).send('No event found')
+        return
+      }
+      res.setHeader('x-total-count', result.count.toString())
+      res.json(result.events)
+    } catch (error) {
+      if (pageNo < 1 || pageSize < 1) {
+        res.status(400).send('Invalid pageNo or pageSize')
+      } else {
+        res.status(500).send('Internal Server Error')
+      }
       return
     }
-    res.setHeader('x-total-count', result.count.toString())
-    res.json(result.events)
   } else if (req.query.category) {
     const category = req.query.category
     res.json(await service.getAllEvents())
