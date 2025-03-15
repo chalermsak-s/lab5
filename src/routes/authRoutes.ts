@@ -1,21 +1,47 @@
-import * as authService from '../services/authService';
-import express from 'express';
-import type { role } from '@prisma/client';
-const router = express.Router();
-router.post('/authenticate', async (req:any, res:any) => {
-  const { username, password } = req.body;
-  const user = await authService.findByUsername(username);
+import * as authService from '../services/authService'
+import * as authMiddleware from '../middleware/authMiddleware'
+import express from 'express'
+import type { role } from '@prisma/client'
+
+const router = express.Router()
+
+router.get('/me', authMiddleware.protect, async (req, res) => {
+  const user = req.body.user
+  res.status(200).json({
+    status: 'success',
+    user: {
+      id: user.id,
+      username: user.organizer?.name || 'unknown',
+      events: user.organizer?.events || [],
+      roles: user.roles.map((role: role) => role.name),
+    },
+  })
+})
+
+router.post('/authenticate', async (req, res) => {
+  const { username, password } = req.body
+  // Ensure `findByUsername` returns a user or null
+  const user = await authService.findByUsername(username)
   if (!user) {
-    return res.status(401).json({ messege: "User doesn't exist" });
+    res.status(401).json({ message: "User doesn't exist" })
+    return
   }
-  if (password === undefined || user.password === undefined || user.password === null) {
-    return res.status(400).json({ messege: 'Password is required' });
+
+  if (!password || !user.password) {
+    res.status(400).json({ message: 'Password is required' })
+    return
   }
-  const isPasswordCorrect = await authService.comparePassword(password, user.password);
+
+  const isPasswordCorrect = await authService.comparePassword(
+    password,
+    user.password
+  )
   if (!isPasswordCorrect) {
-    return res.status(401).json({ messege: 'Invalid credentials' });
+    res.status(401).json({ message: 'Invalid credentials' })
+    return
   }
-  const token = authService.generatetoken(user.id);
+
+  const token = authService.generatetoken(user.id)
   res.status(200).json({
     status: 'success',
     access_token: token,
@@ -24,9 +50,20 @@ router.post('/authenticate', async (req:any, res:any) => {
       username: user.organizer?.name || 'unknown',
       roles: user.roles.map((role: role) => role.name),
     },
-  });
-});
-router.post('/',(req,res)=>{
-    res.json([555]);
-});
+  })
+  return
+})
+
+router.post(
+  '/admin',
+  authMiddleware.protect,
+  authMiddleware.checkAdmin,
+  async (req, res) => {
+    res.status(200).json({
+      status: 'success',
+      message: 'You are an admin',
+    })
+  }
+)
+
 export default router

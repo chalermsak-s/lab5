@@ -27,7 +27,7 @@ const port = process.env.PORT || 3000;
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-app.post('/upload', upload.single('file'), async (req: any, res: any) => {
+app.post('/upload', upload.single('file'), async (req:any, res:any) => {
   try {
     const file = req.file;
     if (!file) {
