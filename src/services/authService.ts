@@ -1,5 +1,5 @@
 import { AuthResponse } from '../models/authResponse'
-import type { RegisterRequest } from '../models/RegisterRequest'
+import type { RegisterRequest } from '../models/registerRequest'
 import * as authRepo from '../repository/authRepository'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
@@ -35,4 +35,8 @@ export function registerUser(registerRequest: RegisterRequest) {
     bcrypt.hashSync(password),
     ['ROLE_USER']
   )
+}
+
+export function updatePassword(userId: number, password: string) {
+  return authRepo.updatePassword(userId, bcrypt.hashSync(password))
 }
