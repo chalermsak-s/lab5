@@ -30,15 +30,34 @@ model event {
   time         String
   petsAllowed  Boolean
   organizerId  Int?
-  organizer    organizer?    @relation(fields: [organizerId], references: [id])
+  organizer    organizer?    @relation(fields: [organizerId], references: [id], name: "OrganizerEvents")
   participants participant[]
 }
 
 model organizer {
   id     Int     @id @default(autoincrement())
   name   String
-  events event[]
+  userId Int? @unique
+  user    user?  @relation(fields: [userId], references: [id])
+  events  event[] @relation("OrganizerEvents")
+
 }
+
+model user {
+  id          Int        @id @default(autoincrement())
+  username    String     @unique
+  password    String?
+  roles       role[]
+  organizer   organizer?
+}
+
+model role {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  users       user[]
+}
+
+
 
 model participant {
   id     Int     @id @default(autoincrement())
@@ -46,5 +65,7 @@ model participant {
   email  String
   events event[] 
 }
+
+
 
 
