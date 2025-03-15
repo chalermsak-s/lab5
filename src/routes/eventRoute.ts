@@ -20,6 +20,7 @@ router.get('/', async (req: Request, res: Response) => {
         return
       }
       res.setHeader('x-total-count', result.count.toString())
+      res.setHeader("Access-Control-Expose-Headers", "x-total-count")
       res.json(result.events)
     } catch (error) {
       if (pageNo < 1 || pageSize < 1) {
