@@ -57,8 +57,6 @@ model role {
   users       user[]
 }
 
-
-
 model participant {
   id     Int     @id @default(autoincrement())
   name   String
